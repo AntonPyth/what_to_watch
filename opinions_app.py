@@ -4,7 +4,8 @@ from random import randrange
 from flask import Flask, render_template
 from flask_sqlalchemy import SQLAlchemy
 
-app = Flask(__name__, static_folder='static_dir')
+# Use project `static/` directory so url_for('static', ...) works
+app = Flask(__name__, static_folder='static')
 
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///db.sqlite3'
 
@@ -31,7 +32,7 @@ def index_view():
 
 @app.route('/add')
 def add_opinion_view():
-    return 'Страница в разработке!'
+    return render_template('add_opinion.html')
 
 
 if __name__ == '__main__':
