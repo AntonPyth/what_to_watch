@@ -3,12 +3,14 @@ from random import randrange
 
 from flask import Flask, render_template
 from flask_sqlalchemy import SQLAlchemy
+from flask_wtf import FlaskForm
+from wtforms import StringField, SubmitField, TextAreaField, URLField
+from wtforms.validators import DataRequired, Length, Optional
 
-# Use project `static/` directory so url_for('static', ...) works
 app = Flask(__name__, static_folder='static')
 
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///db.sqlite3'
-
+app.config ['SECRET_KEY'] = 'Anton123'
 db = SQLAlchemy(app)
 
 
@@ -19,6 +21,22 @@ class Opinion(db.Model):
     source = db.Column(db.String(256))
     timestamp = db.Column(db.DateTime, index=True, default=datetime.utcnow)
 
+
+class OpinionForm(FlaskForm):
+    title = StringField(
+        'Введите название фильма',
+        validators=[DataRequired(message='Обязательное поле'),
+                    Length(1, 128)]
+    )
+    text = TextAreaField(
+        'Напишите мнение', 
+        validators=[DataRequired(message='Обязательное поле')]
+    )
+    source = URLField(
+        'Добавьте ссылку на подробный обзор фильма',
+        validators=[Length(1, 256), Optional()]
+    )
+    submit = SubmitField('Добавить')
 
 @app.route('/')
 def index_view():
@@ -32,14 +50,14 @@ def index_view():
 
 @app.route('/add')
 def add_opinion_view():
-    return render_template('add_opinion.html')
+    form = OpinionForm()
+    return render_template('add_opinion.html', form=form)
 
 
-@app.route('/opinions/<int:id>')  
-def opinion_view(id):  
-    # Метод get() заменён на get_or_404():
-    opinion = Opinion.query.get_or_404(id)  
-    return render_template('opinion.html', opinion=opinion) 
+@app.route('/opinions/<int:id>')
+def opinion_view(id):
+    opinion = Opinion.query.get_or_404(id)
+    return render_template('opinion.html', opinion=opinion)
 
 
 if __name__ == '__main__':
