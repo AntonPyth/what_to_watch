@@ -3,7 +3,7 @@
 from datetime import datetime
 from random import randrange
 
-from flask import Flask, redirect, render_template, url_for
+from flask import Flask, flash, redirect, render_template, url_for
 from flask_sqlalchemy import SQLAlchemy
 
 from flask_wtf import FlaskForm
@@ -37,7 +37,7 @@ class OpinionForm(FlaskForm):
         validators=[DataRequired(message='Обязательное поле')],
     )
     source = URLField(
-        'Добавьте ссылку на страницу фильма на IMDB',
+        'Добавьте ссылку на подробный обзор фильма',
         validators=[Length(1, 256), Optional()],
     )
     submit = SubmitField('Добавить')
@@ -57,8 +57,17 @@ def index_view():
 def add_opinion_view():
     form = OpinionForm()
     if form.validate_on_submit():
+        text = form.text.data
+        # Если в БД уже есть мнение с текстом, который ввёл пользователь...
+        if Opinion.query.filter_by(text=text).first() is not None:
+            # ...вызвать функцию flash и передать соответствующее сообщение:
+            flash('Такое мнение уже было оставлено ранее!')
+            # Вернуть пользователя на страницу «Добавить новое мнение»:
+            return render_template('add_opinion.html', form=form)
         opinion = Opinion(
-            title=form.title.data, text=form.text.data, source=form.source.data
+            title=form.title.data, 
+            text=text, 
+            source=form.source.data
         )
         db.session.add(opinion)
         db.session.commit()
