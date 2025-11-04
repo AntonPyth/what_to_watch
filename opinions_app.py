@@ -10,7 +10,7 @@ from wtforms.validators import DataRequired, Length, Optional
 app = Flask(__name__, static_folder='static')
 
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///db.sqlite3'
-app.config ['SECRET_KEY'] = 'Anton123'
+app.config['SECRET_KEY'] = 'Anton123'
 db = SQLAlchemy(app)
 
 
@@ -29,14 +29,15 @@ class OpinionForm(FlaskForm):
                     Length(1, 128)]
     )
     text = TextAreaField(
-        'Напишите мнение', 
+        'Напишите мнение',
         validators=[DataRequired(message='Обязательное поле')]
     )
     source = URLField(
         'Добавьте ссылку на подробный обзор фильма',
         validators=[Length(1, 256), Optional()]
     )
-    submit = SubmitField('Добавить')
+    submit = SubmitField('Отправить')
+
 
 @app.route('/')
 def index_view():

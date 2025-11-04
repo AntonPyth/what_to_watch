@@ -1,3 +1,4 @@
+# Рекомендуется предварительно обновить pip: python -m pip install --upgrade pip
 Flask==3.0.2
-pip==25.3
+Flask-WTF==1.2.1
 python-dotenv==1.0.1
