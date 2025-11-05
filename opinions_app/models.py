@@ -1,4 +1,7 @@
-from datetime import datetime
+from datetime import datetime, timezone
+# Если у вас установлен Python до версии 3.11, используйте другой импорт:
+# from datetime import datetime, timezone
+# А также поменяйте в коде UTC на timezone.utc
 
 from . import db
 
@@ -8,5 +11,16 @@ class Opinion(db.Model):
     title = db.Column(db.String(128), nullable=False)
     text = db.Column(db.Text, unique=True, nullable=False)
     source = db.Column(db.String(256))
-    timestamp = db.Column(db.DateTime, index=True, default=datetime.utcnow)
+    timestamp = db.Column(db.DateTime, index=True, default=datetime.now(timezone.utc))
     added_by = db.Column(db.String(64))
+
+    # Вот он — новый метод:
+    def to_dict(self):
+        return dict(
+            id = self.id,
+            title = self.title,
+            text = self.text,
+            source = self.source,
+            timestamp = self.timestamp,
+            added_by = self.added_by
+        )
